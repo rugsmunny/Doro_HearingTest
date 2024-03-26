@@ -1,0 +1,258 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  font-family: 'BrandonTextBold';
+  
+}
+
+@font-face {
+  font-family: 'BrandonTextBold';
+  src: url('../resources/fonts/brandon/HvDTrial_Brandon_Text_Bold-BF6514e9eb720dc.otf') format('opentype');
+  font-weight: bold;
+}
+
+#hearing-test-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  width: 80em;
+  height: 45em;
+  background: url('../resources/images/hearing_buds/hearing-bud-closer-to-case.png'), radial-gradient(circle at 0%, #008545 20%, #008545 55%, #fff 55%);
+  background-repeat: no-repeat;
+  background-position:8% 90%;
+  box-shadow:
+  20px 20px 60px rgba(0, 0, 0, 0.2),
+  0px 0px 0px rgba(0, 0, 0, 0.1),
+  inset 5px 5px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 1em;
+  padding: 2rem;
+}
+
+
+
+.title {
+  color: #fff;
+  font-size: 3rem;
+  line-height: 3.5rem;
+  left: 1em;
+  text-shadow: 1px 1px 2px rgb(0,0,0,0.3);
+}
+
+
+
+.tab-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  position: relative;
+  padding: 2px;
+  background-color: #ebebec;
+  border-radius: 9px;
+  margin: 10px 20px 0px 20px;
+}
+
+.indicator {
+  content: "";
+  width: 50%;
+  height: 28px;
+  background: #FFFFFF;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 9;
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.12), 0px 3px 1px rgba(0, 0, 0, 0.04);
+  border-radius: 7px;
+  transition: all 0.2s ease-out;
+}
+
+.tab {
+  width: 50%;
+  height: 28px;
+  position: relative;
+  z-index: 99;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tab--1:hover~.indicator {
+  left: 2px;
+}
+
+.tab--2:hover~.indicator {
+  left: calc(50% - 2px);
+}
+
+.info-top-section {
+  padding: 2em 0 0 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.info-top-section>span {
+  font-size: 2em;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgb(0,0,0,0.3);
+  
+
+}
+.info-top-section>p {
+  font-size: 1.2em;
+}
+.info-top-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.info-top-section ul li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  
+}
+
+.info-top-section ul li span {
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgb(255,255,255,1);
+  
+}
+
+.info-mid-section {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  position: relative;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  width: 35%;
+  overflow: visible;
+  
+}
+
+.info-low-section {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: end;
+  justify-content: end;
+  right: 3em;
+  position: relative;
+  height: 10em;
+}
+
+.info-mid-section>span {
+  font-weight: 100;
+  
+}
+
+.info-mid-section ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 1em;
+}
+
+.info-mid-section ul li {
+  list-style: none;
+}
+
+.info-mid-section ul li span {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #2B2B2F;
+  width: 75%;
+  
+  
+}
+
+.price {
+  position: relative;
+  font-size: 32px;
+  color: #2B2B2F;
+  font-weight: 900;
+}
+
+.price sup {
+  font-size: 13px;
+}
+
+.price sub {
+  width: fit-content;
+  position: absolute;
+  font-size: 11px;
+  color: #5F5D6B;
+  bottom: 5px;
+  display: inline-block;
+}
+
+.form {
+  display: flex;
+  flex-flow: column wrap;
+  gap: 10px;
+  background-image: url('../resources/images/logo/fg_green_bg_transparent.png');
+  background-repeat: no-repeat;
+  background-position: top right;
+  
+}
+.button {
+  font-size: 17px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgb(56, 56, 56) 0%, rgb(36, 36, 36) 66%, rgb(41, 41, 41) 100%);
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 2px;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.button span {
+  border-radius: 10px;
+  padding: 0.8em 1.3em;
+  padding-right: 1.2em;
+  text-shadow: 0px 0px 20px #4b4b4b;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  transition: all 0.3s;
+  background-color: rgb(29, 29, 29);
+  background-image: radial-gradient(at 95% 89%, rgb(15, 15, 15) 0px, transparent 50%), radial-gradient(at 0% 100%, rgb(17, 17, 17) 0px, transparent 50%), radial-gradient(at 0% 0%, rgb(29, 29, 29) 0px, transparent 50%);
+}
+
+.button:hover {
+  box-shadow: 2px 2px 6px #616060;
+}
+
+.button-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-conic-gradient(rgb(48, 47, 47) 0.0000001%, rgb(51, 51, 51) 0.000104%) 60% 60%/600% 600%;
+  filter: opacity(10%) contrast(105%);
+  -webkit-filter: opacity(10%) contrast(105%);
+}
+
+.button svg {
+  width: 15px;
+  height: 15px;
+}
