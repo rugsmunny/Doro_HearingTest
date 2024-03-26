@@ -22,9 +22,6 @@ const startBtn = document.querySelector('#start-test-btn');
 
 startBtn.onclick = playback;
 
-
-
-
 function changeBackgroundPictures() {
     const modal = document.querySelector('.modal');
     const imagesFolder = 'resources/images/hearing_buds/';
