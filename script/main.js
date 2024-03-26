@@ -15,21 +15,23 @@ function sayHi(){
     new Audio(`resources/sounds/testsounds/${soundToGet}.ogg`).play();
 }*/
 const modal = document.querySelector('.app');
+const form = document.querySelector('.form');
 let testStarted = false;
 let timeoutID = null;
 function startTest(event){
     event.preventDefault();
-
     testStarted = true;
     clearTimeout(timeoutID);
     const infoSegments = document.querySelectorAll('.info');
     infoSegments.forEach(segment => segment.classList.add('hide'));
+    modal.classList.add('hide');
+    form.innerHTML = `<p class="miffo">Testet har startat. Du kommer att höra en serie ljud. Klicka på knappen när du hör ljudet.</p>`;
 }
 
 const startBtn = document.querySelector('#start-test-btn');
 
 startBtn.onclick = startTest;
-
+let imageUrl = '';
 
 function changeBackgroundPictures() {
     
@@ -39,7 +41,7 @@ function changeBackgroundPictures() {
     console.log(`changeBackgroundPictures current index ${currentIndex}`);
     function changeImage() {
         console.log(`changeImage current index ${currentIndex}`);
-        const imageUrl = `url('${imagesFolder}${imageNames[currentIndex]}')`;
+        imageUrl = `url('${imagesFolder}${imageNames[currentIndex]}')`;
         modal.style.backgroundImage = `${imageUrl}, radial-gradient(circle at 0%, #008545 20%, #008545 55%, #fff 55%)`;
         currentIndex = (currentIndex + 1) % imageNames.length;
         timeoutID  = setTimeout(changeImage, 3500); 
