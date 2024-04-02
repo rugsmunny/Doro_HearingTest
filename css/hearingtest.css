@@ -46,6 +46,7 @@
     inset 0.5em 0.5em 3em rgba(0, 0, 0, 0.2);
   border-radius: 1em; 
   padding: 1em;
+
 }
 
 .app-container {
@@ -106,8 +107,7 @@
 }
 
 
-
-.title {
+#title {
   font-family: 'BrandonTextBold';
   color: #fff;
   font-size: 3rem;
@@ -137,8 +137,6 @@
   font-size: 1.2em;
 }
 
-
-
 .top-section ul li span {
   font-weight: 600;
   text-shadow: 1px 1px 2px rgb(255, 255, 255, 1);
@@ -153,21 +151,26 @@
   opacity: 0;
 }
 
-.miffo {
+#start-test-btn.hide {
   display: none;
 }
 
 .app.hide {
   background-position: -60% 85%;
-  transition: background-position 4s ease-out; 
+  transition: background-position 2s ease-out; 
   .app-container {
     background-color: #eee;
     opacity: 1;
  
   }
+  width: 65em;
+  -webkit-transition:width 3000ms ease-in-out, height 3000ms ease-in-out;
+  -moz-transition:width 3000ms ease-in-out, height 3000ms ease-in-out;
+  -o-transition:width 3000ms ease-in-out, height 3000ms ease-in-out;
+  transition:width 3000ms ease-in-out, height 3000ms ease-in-out;
   
 }
-  
+
 
 .disclaimer {
   width: 100%;
@@ -183,6 +186,7 @@
   font-family: 'BrandonTextMedium';
   font-size: 1rem;
   color: #2B2B2F;
+  list-style: none;
 }
 
 
@@ -235,3 +239,8 @@
   width: 1.5rem;
   height: 1.5rem;
 }
+
+/*---------------------*/
+
+/* TEST PAGES */
+
