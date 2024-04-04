@@ -33,54 +33,51 @@
 
             <div class="part-2">
                 <div class="question-container question-3">
-                    <div class="question">Do you have any situations where you have difficulties hearing?</div>
                     <div class="checkbox-container">
-                        <ul>
-
-                            <li>
-                                <input type="checkbox" id="noisy-environment" class="input-checkbox">
-                                <label for="noisy-environment">Noisy environment (restaurants etc.)</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="tv-radio" class="input-checkbox">
-                                <label for="tv-radio">Watching TV/Radio</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="talking-to-people" class="input-checkbox">
-                                <label for="talking-to-people">Talking to people</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="other-checkbox" class="input-checkbox">
-                                <label for="other">Other</label>
-                                <input type="text" id="other-text" class="input-text" placeholder="Tell us about it...">
-                            </li>
-                            <li>
-                                <input type="checkbox" id="never" class="input-checkbox">
-                                <label for="never">Never</label>
-                            </li>
-                        </ul>
+                        <figure>
+                            <figcaption>Do you have any situations where you have difficulties hearing?</figcaption>
+                            <ul>
+                                <li>
+                                    <input type="checkbox" id="noisy-environment" class="input-checkbox">
+                                    <label for="noisy-environment">Noisy environment (restaurants etc.)</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="tv-radio" class="input-checkbox">
+                                    <label for="tv-radio">Watching TV/Radio</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="talking-to-people" class="input-checkbox">
+                                    <label for="talking-to-people">Talking to people</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="other-checkbox" class="input-checkbox">
+                                    <label for="other">Other</label>
+                                    <input type="text" id="other-text" class="input-text" placeholder="Tell us about it...">
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="never" class="input-checkbox">
+                                    <label for="never">Never</label>
+                                </li>
+                            </ul>
+                        </figure>
+                        
                     </div>
                     <div class="question">This information will only be used internally by Doro to se the effect of your
                         test.</div>
                 </div>
             </div>
-
-
         </div>
 
         <div class="button-container">
 
-            <div class="navigation-button" data-direction="-1">
-                <svg style="transform: rotate(180deg);" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <image height="24" width="24" href="../resources/images/icon/arrow.svg" ></image>
-                </svg><span>Back</span>
+            <div class="navigation back disabled" data-direction="1">
+                <img src="../resources/images/icon/arrow.svg" alt="Arrow">
+                <span>Next</span>
             </div>
 
-            <div class="navigation-button disabled" data-direction="1">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <image height="24" width="24" href="../resources/images/icon/arrow.svg"></image>
-                </svg><span>Next</span>
-
+            <div class="navigation next disabled" data-direction="1">
+                <img src="../resources/images/icon/arrow.svg" alt="Arrow">
+                <span>Next</span>
             </div>
         </div>
         <div class="progress-bar">
@@ -94,11 +91,7 @@
 </body>
 <script>
     var selectElement = document.getElementById("year-of-birth");
-
-    // Hämta aktuellt år
     var currentYear = new Date().getFullYear();
-
-    // Skapa dropdownalternativ för år från aktuellt år till 120 år bakåt
     for (var year = currentYear; year >= currentYear - 120; year--) {
         var option = document.createElement("option");
         option.value = year;
