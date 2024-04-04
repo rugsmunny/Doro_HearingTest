@@ -52,6 +52,28 @@
   align-self: stretch;
 }
 
+select {
+  padding-right: 20px; 
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: 6rem;
+  text-align: center;
+}
+
+
+select:hover {
+  border-color: #999; 
+}
+
+
+select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
 .part-1 {
   justify-content: center;
 }
@@ -80,13 +102,15 @@
 }
 
 .navigation-button {
-  display: flex;
   padding: 0.625rem 1.5rem 0.625rem 1rem;
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
   flex: 1 0 0;
   align-self: stretch;
+  background-color: #008545;
+  color: #FFFFFF;
+  border-radius: 6.25rem;
 
   >span {
     color: #fff;
@@ -99,9 +123,9 @@
   }
 }
 
-.navigation-button+.disabled {
+.navigation-button.disabled {
   background: var(--color-grey-black, #333F48);
-
+  color: #fff;
   font-size: 24px;
   font-weight: 500;
   border: none;
@@ -110,9 +134,10 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 6.25rem;
+
   opacity: 0.38;
   cursor: not-allowed;
+  
 }
 
 .question {
@@ -136,18 +161,6 @@
 
 .checkbox-container label {
   line-height: 2.25rem;
-}
-
-
-.input-radio:checked+label::before {
-  content: "";
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background-color: #008545;
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 6px;
 }
 
 .input-text {
@@ -191,7 +204,10 @@
 }
 
 .button-container {
-  margin-top: 20px;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
 }
 
 .tooltip {

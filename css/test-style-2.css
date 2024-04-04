@@ -58,9 +58,10 @@
   align-items: flex-start;
 }
 
-.radio-container {
+
+.question-container {
   display: flex;
-  gap: 1.5rem;
+  flex-direction: row;
 }
 
 .question-container li,
@@ -188,8 +189,10 @@
   cursor: pointer;
 }
 
-.button-container {
-  margin-top: 20px;
+.button-container-2 {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6.9375rem;
 }
 
 .tooltip {
@@ -278,7 +281,6 @@
 }
 
 .roboto-fs-1p5-fw-400-lh-2p25 {
-  align-self: stretch;
   color: var(--text-text-primary, #333F48);
   /* Body/Desktop/body 1 */
   font-family: Roboto, sans-serif;
@@ -294,14 +296,23 @@
   flex-direction: row;
 }
 
-.calibrate.inner-container {
+.calibrate {
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 2.5rem;
+
+  >.inner-container {
+    height: 38.25rem;
+  }
+
 }
 
-.calibrate,
+.calibrate-important {
+  display: flex;
+  gap: 1.5rem;
+}
+
 .calibrate-info {
   display: flex;
   flex-direction: column;
@@ -323,4 +334,33 @@
 
     }
   }
+}
+
+.calibrate-button {
+  display: flex;
+  padding: 1rem;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 0.9375rem;
+  width: 18.3125rem;
+  background: var(--surface-surface-softaccent, #EAEAEA);
+}
+
+.play-button {
+  display: flex;
+  width: 5rem;
+  height: 5rem;
+  padding: 0.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 5.31913rem;
+  background: var(--color-brand-green, #008545);
+}
+
+.hand-rub {
+  width: 12.41356rem;
+  height: 24.06006rem;
+  transform: rotate(6.714deg);
+  flex-shrink: 0;
+  fill: var(--color-brand-green, #008545);
 }
