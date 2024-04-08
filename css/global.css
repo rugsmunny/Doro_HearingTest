@@ -1,0 +1,25 @@
+body {
+    margin: 0;
+    line-height: normal;
+  }
+  
+  :root {
+    /* fonts */
+    --body-desktop-body-1: Roboto;
+  
+    /* font sizes */
+    --body-desktop-body-1-size: 1.5rem;
+    --font-size-lgi: 1.188rem;
+    --heading-desktop-sub-heading-size: 2rem;
+    --heading-desktop-h2-size: 3rem;
+  
+    /* Colors */
+    --surface-surface-primary: #fff;
+    --text-text-primary: #333f48;
+    --surface-surface-brand: #008545;
+  
+    /* Paddings */
+    --padding-xl: 1.25rem;
+    --padding-base: 1rem;
+  }
+  
