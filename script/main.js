@@ -37,19 +37,36 @@ navButtons.forEach(button => button.addEventListener('click', function () {
         slideToShow.classList.add('fade-in');
     }, 2000);
 }));
+
+
 const formRequirements = [0, 0, 0];
 const dateOfBirthInput = document.getElementById('year-of-birth');
+const newDate = new Date();
+const todaysDate = newDate.toISOString().slice(0, 10);
+const minDateValue = newDate.getFullYear() - 100 + '-01-01';
+dateOfBirthInput.setAttribute('max', todaysDate);
+dateOfBirthInput.setAttribute('min', minDateValue);
+dateOfBirthInput.setAttribute('value', todaysDate);
+
+console.log('current value: ' + dateOfBirthInput.getAttribute('value') + '\nmax date value: ' +dateOfBirthInput.getAttribute('max') + '\nmin date value: ' + dateOfBirthInput.getAttribute('min'));
+
+dateOfBirthInput.addEventListener('cleared', function () {
+console.log('cleared listener triggered!!');
+    dateOfBirthInput.setAttribute('value', todaysDate);
+});
 
 dateOfBirthInput.addEventListener('input', function () {
 
-    const currentYear = new Date().getFullYear();
-    if (parseInt(this.value) > currentYear || parseInt(this.value) < currentYear - 100) {
-        alert('Please enter a valid year of birth.');
+    if (parseInt(this.value) > todaysDate || parseInt(this.value) < minDateValue) {
         formRequirements[0] = 0;
     } else {
         formRequirements[0] = 1;
     }
     validateForm();
+    console.log('current value: ' + dateOfBirthInput.getAttribute('value') + '\nmax date value: ' +dateOfBirthInput.getAttribute('max') + '\nmin date value: ' + dateOfBirthInput.getAttribute('min'));
+    console.log(dateOfBirthInput.getAttribute('value'));
+    console.log(dateOfBirthInput.getAttribute('value'));
+
 });
 
 const genderRadioButtons = document.querySelectorAll('.input-radio');
