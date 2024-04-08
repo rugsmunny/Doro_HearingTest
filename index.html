@@ -13,7 +13,7 @@
 
 <body>
 
-    <div id="slide-1" class="container sp-between">
+    <div id="slide-1" class="container sp-between" >
         <div class="hero-image" alt="Hero Image"></div>
         <div class="mid-section centered">
             <section class="title main">
@@ -23,14 +23,22 @@
                 Welcome to our Online Hearing Test!
                 Discover if the HearingBuds could be beneficial for you
             </section>
-            <section id="start-button" class="nav-button" data-direction="1">
-                <div>
-                    <span>
-                        Start the test
-                    </span>
-                    <div class="arrow-icon"></div>
-                </div>
-            </section>
+            <div class="nav-container">
+                <section class="nav-button next" data-direction="1">
+                    <div>
+                        <p>
+                            Start the test
+                        </p>
+                        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="icon">
+                                <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+                                    fill="currentColor" />
+                            </g>
+                        </svg>
+                    </div>
+                </section>
+            </div>
         </div>
         <div class="disclaimer">
             DISCLAIMER: This test is not intended to diagnose hearing loss. It is only meant to provide an indicator to
@@ -43,35 +51,34 @@
         <div class="mid-section slide">
             <section class="title">First tell us a little about yourself</section>
             <section class="part-1">
-                <div>
-                    <div class="question">Date of birth</div>
-                    <select id="year-of-birth" name="year-of-birth"></select>
-                </div>
-
                 <section>
-                    <div class="question">Pick your gender</div>
-                    <div class="radio-container">
-                        <div class="part-2"><input type="radio" id="male" name="gender" class="input-radio">
+                    <div class="question">Date of birth</div>
+                    <input type="date" id="year-of-birth"/>
+                </section>
+                <section>
+                    <div class="question">Your gender</div>
+                    <ul class="radio-list">
+                        <li class="radio-item">
+                            <input type="radio" id="male" name="gender" class="input-radio">
                             <label for="male">Male</label>
-                        </div>
-                        <div class="part-2"> <input type="radio" id="female" name="gender" class="input-radio">
+                        </li>
+                        <li class="radio-item">
+                            <input type="radio" id="female" name="gender" class="input-radio">
                             <label for="female">Female</label>
-                        </div>
-                        <div class="part-2"><input type="radio" id="no-answer" name="gender" class="input-radio">
+                        </li>
+                        <li class="radio-item">
+                            <input type="radio" id="no-answer" name="gender" class="input-radio">
                             <label for="no-answer">Prefer not to answer</label>
-                        </div>
-
-
-
-                    </div>
+                        </li>
+                    </ul>
 
                 </section>
             </section>
-            <section class="part-1 margin-top-2p5">
+            <section class="part-1">
 
 
                 <div class="question">Do you have any situations where you have difficulties hearing?</div>
-                <ul>
+                <ul  class="checkbox-list">
                     <li>
                         <input type="checkbox" id="noisy-environment" class="input-checkbox">
                         <label for="noisy-environment">Noisy environment (restaurants etc.)</label>
@@ -99,24 +106,25 @@
                     test.</div>
             </section>
             <div class="nav-container">
-                <section class="nav-button" data-direction="1">
+                <section id="form-btn" class="nav-button next inactive" data-direction="1">
                     <div>
-                        <span>
+                        <p>
                             Next
-                        </span>
-                        <div class="arrow-icon"></div>
+                        </p>
+                        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="icon">
+                                <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+                                    fill="currentColor" />
+                            </g>
+                        </svg>
                     </div>
                 </section>
             </div>
-
         </div>
-
         <div class="progress-bar">
             <div class="page-number">1/4</div>
-            <div class="progress-container">
-                <div class="progress-background"></div>
-                <div class="progress-bar-inner"></div>
-            </div>
+            <progress value="1" max="4"></progress>
         </div>
     </div>
 
@@ -176,21 +184,38 @@
             </div>
         </div>
         <div class="nav-container">
-            <section class="nav-button" data-direction="1">
+            <section class="nav-button back" data-direction="-1">
                 <div>
-                    <span>
-                        Next
-                    </span>
-                    <div class="arrow-icon"></div>
+                    <p>
+                        Back
+                    </p>
+                    <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <g id="icon">
+                            <path d="M12 4L10.59 5.41L16.17 11H4V13H16.17L10.59 18.59L12 20L20 12L12 4Z"
+                                fill="currentColor" />
+                        </g>
+                    </svg>
+                </div>
+            </section>
+            <section class="nav-button next" id="without-headphones">
+                <div>
+                    <p>
+                        Test without headphones
+                    </p>
+                </div>
+            </section>
+            <section class="nav-button next" id="with-headphones">
+                <div>
+                    <p>
+                        Test with headphones
+                    </p>
                 </div>
             </section>
         </div>
         <div class="progress-bar">
-            <div class="page-number">1/4</div>
-            <div class="progress-container">
-                <div class="progress-background"></div>
-                <div class="progress-bar-inner"></div>
-            </div>
+            <div class="page-number">2/4</div>
+            <progress value="2" max="4"></progress>
         </div>
     </div>
 </body>
