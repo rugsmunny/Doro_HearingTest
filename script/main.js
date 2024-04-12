@@ -1,13 +1,31 @@
-/*
-document.addEventListener('DOMContentLoaded', setTimeout(sayHi, 3000));
+const calibrationBtn = document.querySelector('.calibrate-button');
+const formBtn = document.getElementById('form-btn');
+const navButtons = document.querySelectorAll('.nav-button');
+const genderRadioButtons = document.querySelectorAll('.input-radio');
+const soundCheckBoxes = document.querySelectorAll('.input-checkbox');
+const otherInput = document.getElementById('other-text');
+const yearOfBirth = document.getElementById("year-of-birth");
+const dialogTextContainer = document.getElementById('dialog-text');
+document.getElementById('dialog-close-btn').addEventListener('click', () => window.dialog.close());
+const currentYear = new Date().getFullYear();
+let birthYearOption = document.createElement("option");
+let pageNumber = 1;
 
-function sayHi(){
-    const alarmBtn = Object.assign(document.createElement('button'), { id: 'alarm'});
-    alarmBtn.innerText = 'PUSH ME';
-    alarmBtn.onclick = playback;
-    document.querySelector('#test').textContent = "SCRIPTET FUNKAR!";
-    document.querySelector('body').append(alarmBtn);
-}*/
+const withHeadphonesText = 'For both left and right ear, there are 5 sliders, each playing the same sound at a different frequency.<br><br>Adjust each slider to increase or decrease the volume level until you can barely hear the sound on that slider.';
+const withoutHeadphonesText = 'There are 5 sliders, each playing the same sound at a different frequency.<br><br>Adjust each slider up or down to increase or decrease the volume level until you can barely hear the sound on that slider.';
+const hearingbudsMayHelpTitle = 'The HearingBuds may help';
+const hearingbudsMayHelpText = 'Your test results show that you have mild to moderate hearing loss in both ears across different frequencies.';
+const hearingbudsMayNotHelpTitle = 'The HearingBuds will probably not help you';
+const hearingbudsMayNotHelpText = 'Based on your online hearing test results, your hearing sensitivity is within normal range across all frequencies tested.';
+
+
+navButtons.forEach(button => button.addEventListener('click', (event) => navigate(event)));
+yearOfBirth.addEventListener('input', validateForm);
+genderRadioButtons.forEach(radioButton => radioButton.addEventListener('click', validateForm));
+soundCheckBoxes.forEach(checkbox => checkbox.addEventListener('click', validateForm));
+otherInput.addEventListener('input', validateForm);
+calibrationBtn.addEventListener('click', playback);
+
 
 function playback(event) {
     event.preventDefault();
@@ -16,86 +34,108 @@ function playback(event) {
     new Audio(`resources/sounds/testsounds/${soundToGet}.ogg`).play();
 }
 
-let pageNumber = 1;
-let navButtons = document.querySelectorAll('.nav-button');
-navButtons.forEach(button => button.addEventListener('click', function () {
-    console.log(`pageNumber : ${pageNumber}`);
+formBtn.addEventListener('mouseenter', () => {
+    if (formBtn.classList.contains('inactive') && !document.querySelector('.tooltip')) {
+        showTooltip();
+    }
+});
 
-    if (button.classList.contains('inactive')) {
+function showTooltip() {
+
+    const tooltip = document.createElement('p');
+    tooltip.textContent = 'Please answer all questions before clicking next.';
+    tooltip.classList.add('tooltip');
+
+    document.body.appendChild(tooltip);
+
+    const mouseMoveHandler = (event) => updateTooltip(event, tooltip);
+    document.addEventListener('mousemove', mouseMoveHandler);
+
+    setTimeout(function () {
+        tooltip.remove();
+        document.removeEventListener('mousemove', mouseMoveHandler);
+    }, 2400);
+}
+
+function updateTooltip(event, tooltip) {
+    tooltip.style.left = event.clientX + 'px';
+    tooltip.style.top = event.clientY + 'px';
+    console.log(`event.clientX : ${event.clientX}`);
+}
+
+
+
+
+
+function navigate(event) {
+    const buttonClicked = event.currentTarget;
+
+    if (buttonClicked.classList.contains('inactive')) {
         return;
     }
+
+    if (buttonClicked.getAttribute('id') !== null && buttonClicked.classList.contains('headphones')) {
+        const testToRun = buttonClicked.getAttribute('id').includes('without');
+        const textToShow = testToRun ? withoutHeadphonesText : withHeadphonesText;
+        document.getElementById('start-hearing-test').addEventListener('click', runTest(testToRun, buttonClicked));
+        dialogTextContainer.innerHTML = `<p>${textToShow}<p>`;
+        window.dialog.showModal();
+        return;
+    }
+
+    getSlide(buttonClicked)
+
+}
+
+
+function getSlide(buttonClicked) {
+
+    buttonClicked.removeEventListener('click', arguments.callee);
     const slideToRemove = document.getElementById(`slide-${pageNumber}`);
-    pageNumber += parseInt(button.dataset.direction);
-    console.log(`pageNumber : ${pageNumber}`);
-    const slideToShow = document.getElementById(`slide-${pageNumber}`);
     slideToRemove.classList.add('fade-out');
+    pageNumber += parseInt(buttonClicked.getAttribute('data-direction'));
+    const slideToShow = document.getElementById(`slide-${pageNumber}`);
 
     setTimeout(function () {
         slideToRemove.style.display = 'none';
         slideToRemove.classList.remove('fade-out');
         slideToShow.style.display = 'flex';
         slideToShow.classList.add('fade-in');
+        buttonClicked.addEventListener('click', arguments.callee);
     }, 2000);
-}));
+
+}
+function runTest(testToRun, buttonClicked) {
+    if (testToRun) {
+        getSlide(buttonClicked);
+    } else { getSlide(buttonClicked); }
+
+    window.dialog.close();
+    console.log(testToRun);
+}
+
+birthYearOption.textContent = "";
+yearOfBirth.appendChild(birthYearOption);
+for (var year = currentYear; year >= currentYear - 120; year--) {
+    birthYearOption = document.createElement("option");
+    birthYearOption.value = year;
+    birthYearOption.textContent = year;
+    yearOfBirth.appendChild(birthYearOption);
+}
 
 
-const formRequirements = [0, 0, 0];
-const dateOfBirthInput = document.getElementById('year-of-birth');
-const newDate = new Date();
-const todaysDate = newDate.toISOString().slice(0, 10);
-const minDateValue = newDate.getFullYear() - 100 + '-01-01';
-dateOfBirthInput.setAttribute('max', todaysDate);
-dateOfBirthInput.setAttribute('min', minDateValue);
-dateOfBirthInput.setAttribute('value', todaysDate);
-
-console.log('current value: ' + dateOfBirthInput.getAttribute('value') + '\nmax date value: ' +dateOfBirthInput.getAttribute('max') + '\nmin date value: ' + dateOfBirthInput.getAttribute('min'));
-
-dateOfBirthInput.addEventListener('cleared', function () {
-console.log('cleared listener triggered!!');
-    dateOfBirthInput.setAttribute('value', todaysDate);
-});
-
-dateOfBirthInput.addEventListener('input', function () {
-
-    if (parseInt(this.value) > todaysDate || parseInt(this.value) < minDateValue) {
-        formRequirements[0] = 0;
-    } else {
-        formRequirements[0] = 1;
-    }
-    validateForm();
-    console.log('current value: ' + dateOfBirthInput.getAttribute('value') + '\nmax date value: ' +dateOfBirthInput.getAttribute('max') + '\nmin date value: ' + dateOfBirthInput.getAttribute('min'));
-    console.log(dateOfBirthInput.getAttribute('value'));
-    console.log(dateOfBirthInput.getAttribute('value'));
-
-});
-
-const genderRadioButtons = document.querySelectorAll('.input-radio');
-genderRadioButtons.forEach(radioButton => radioButton.addEventListener('click', function () {
-    if (Array.from(genderRadioButtons).some(radioButton => radioButton.checked)) {
-        formRequirements[1] = 1;
-    }
-    validateForm();
-}));
-
-const soundCheckBoxes = document.querySelectorAll('.input-checkbox');
-const otherInput = document.getElementById('other-text');
 
 function validateForm() {
+    const selectedYear = yearOfBirth.value !== "";
+    const atLeastOneRadioChecked = Array.from(genderRadioButtons).some(radioButton => radioButton.checked);
+    const atLeastOneCheckboxChecked = Array.from(soundCheckBoxes).some(checkbox => checkbox.checked);
+    const otherCheckboxChecked = document.getElementById('other-checkbox').checked;
+    const otherInputValid = !otherCheckboxChecked || (otherCheckboxChecked && otherInput.value.length >= 5);
 
-    soundCheckBoxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            if (checkbox.id === 'other-checkbox' && otherInput.value.length < 5) {
-                alert('Please elaborate on your answer in the text field.');
-                return;
-            }
-            formRequirements[2] = 1;
-        }
-    });
-    
-    if (formRequirements.reduce((acc, val) => acc + val) === 3) {
-        document.getElementById('form-btn').classList.remove('inactive');
+    if (selectedYear && atLeastOneRadioChecked && atLeastOneCheckboxChecked && otherInputValid) {
+        formBtn.classList.remove('inactive');
     } else {
-        document.getElementById('form-btn').classList.add('inactive');
+        formBtn.classList.add('inactive');
     }
 }
 

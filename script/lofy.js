@@ -38,9 +38,9 @@ navButtons.forEach(button => button.addEventListener('click', function () {
     }, 2000);
 }));
 const formRequirements = [0, 0, 0];
-const dateOfBirthInput = document.getElementById('year-of-birth');
+const yearOfBirth = document.getElementById('year-of-birth');
 
-dateOfBirthInput.addEventListener('input', function () {
+yearOfBirth.addEventListener('input', function () {
 
     const currentYear = new Date().getFullYear();
     if (parseInt(this.value) > currentYear || parseInt(this.value) < currentYear - 100) {
