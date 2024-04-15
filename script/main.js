@@ -1,15 +1,20 @@
 const calibrationBtn = document.querySelector('.calibrate-button');
 const formBtn = document.getElementById('form-btn');
-const navButtons = document.querySelectorAll('.nav-button');
 const genderRadioButtons = document.querySelectorAll('.input-radio');
 const soundCheckBoxes = document.querySelectorAll('.input-checkbox');
 const otherInput = document.getElementById('other-text');
 const yearOfBirth = document.getElementById("year-of-birth");
 const dialogTextContainer = document.getElementById('dialog-text');
 document.getElementById('dialog-close-btn').addEventListener('click', () => window.dialog.close());
+const soundTestIteration = document.getElementById('sound-test-iteration');
+const nextSoundButton = document.getElementById('next-sound');
+const previousSoundButton = document.getElementById('previous-sound');
+const soundTrackButtons = document.querySelectorAll('.sound-track-button');
+const soundTrackEclipse = document.querySelector('.eclipse');
 const currentYear = new Date().getFullYear();
 let birthYearOption = document.createElement("option");
-let pageNumber = 1;
+let pageNumber = 4;
+let soundTrackEclipseTracker = 0;
 
 const withHeadphonesText = 'For both left and right ear, there are 5 sliders, each playing the same sound at a different frequency.<br><br>Adjust each slider to increase or decrease the volume level until you can barely hear the sound on that slider.';
 const withoutHeadphonesText = 'There are 5 sliders, each playing the same sound at a different frequency.<br><br>Adjust each slider up or down to increase or decrease the volume level until you can barely hear the sound on that slider.';
@@ -19,19 +24,58 @@ const hearingbudsMayNotHelpTitle = 'The HearingBuds will probably not help you';
 const hearingbudsMayNotHelpText = 'Based on your online hearing test results, your hearing sensitivity is within normal range across all frequencies tested.';
 
 
-navButtons.forEach(button => button.addEventListener('click', (event) => navigate(event)));
 yearOfBirth.addEventListener('input', validateForm);
 genderRadioButtons.forEach(radioButton => radioButton.addEventListener('click', validateForm));
 soundCheckBoxes.forEach(checkbox => checkbox.addEventListener('click', validateForm));
 otherInput.addEventListener('input', validateForm);
 calibrationBtn.addEventListener('click', playback);
+soundTrackButtons.forEach(button => button.addEventListener('click', handleVolumeButtonClick));
+
+nextSoundButton.addEventListener('click', () => {
+    previousSoundButton.style.visibility = 'visible';
+    let iteration = +parseInt(soundTestIteration.textContent);
+    if (iteration === 5) {
+        getSlide(nextSoundButton);
+    }
+    if (iteration < 5) {
+        soundTestIteration.textContent = ++iteration;
+        if (iteration === 5) {
+            nextSoundButton.querySelector('p').textContent = 'Finish test';
+        }
+    }
 
 
-function playback(event) {
+
+});
+
+previousSoundButton.addEventListener('click', () => {
+    nextSoundButton.querySelector('p').textContent = 'Next sound';
+    soundTestIteration.textContent = parseInt(soundTestIteration.textContent) - 1;
+    if (parseInt(soundTestIteration.textContent) === 1) {
+        previousSoundButton.style.visibility = 'hidden';
+    }
+});
+
+
+function handleVolumeButtonClick(event) {
+    event.preventDefault();
+    const value = +event.currentTarget.getAttribute('value');
+    if (value + soundTrackEclipseTracker >= 0 && value + soundTrackEclipseTracker <= 6) {
+        soundTrackEclipseTracker += value;
+        soundTrackEclipse.style.left = `calc((100% / 6) * ${soundTrackEclipseTracker} - 1.5rem)`;
+    }
+
+    playback(event, soundTrackEclipseTracker + 1);
+
+}
+
+function playback(event, volume) {
     event.preventDefault();
     const soundToGet = '8000_50';
     console.log(soundToGet);
-    new Audio(`resources/sounds/testsounds/${soundToGet}.ogg`).play();
+    const audio = new Audio(`resources/sounds/testsounds/${soundToGet}.ogg`);
+    audio.volume = (1 / 7) * volume;
+    audio.play();
 }
 
 formBtn.addEventListener('mouseenter', () => {

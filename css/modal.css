@@ -1,3 +1,10 @@
+/*
+svh
+lvh 
+
+for mobile
+*/
+
 :root {
   --font-main: Roboto, sans-serif;
   --font-secondary: Inter, sans-serif;
@@ -59,39 +66,83 @@ body {
   align-items: center;
 }
 
-
-
-div section.title {
-  color: var(--color-black);
+.text {
+  color: var(--text-text-primary, #333F48);
   font-family: var(--font-main);
-  font-size: 3rem;
-  font-weight: 700;
-  line-height: 3.5rem;
-
+  line-height: 2.25rem;
+  font-weight: 400;
+  font-size: 1.5rem;
 }
+
+.title {
+  line-height: 3.5rem;
+  font-weight: 700;
+  font-size: 3rem;
+}
+
+.heading {
+  font-size: 2rem;
+  line-height: 3rem;
+}
+
+.align-center {
+  text-align: center;
+  margin: auto;
+}
+
+.align-stretch {
+  align-self: stretch;
+}
+
+.width-large {
+  width: 53.75rem;
+}
+
+.width-medium {
+  width: 35.5rem;
+}
+
+.nav-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+
+  div {
+    padding: 0.625rem 1rem;
+    height: 3.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6.25rem;
+    cursor: pointer;
+    background-color: var(--color-brand);
+
+    p {
+      margin: 0 0.5rem;
+      font-family: var(--font-main);
+      font-size: 1.5rem;
+    
+      font-weight: 500;
+      line-height: 1.25rem;
+      letter-spacing: 0.00625rem;
+      color: var(--color-primary);
+    }
+    
+    .arrow-icon {
+      path {
+        fill: var(--color-primary);
+      }
+    }
+  }
+}
+
 
 .main {
   align-self: stretch;
   text-align: center;
 }
-
-div section.title-sub {
-  width: 35.5rem;
-  color: var(--color-black);
-  text-align: center;
-  font-family: var(--font-main);
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 150%;
-}
-
-div section.nav-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-self: stretch;
-}
-
 
 .nav-container {
   display: flex;
@@ -101,17 +152,6 @@ div section.nav-button {
   margin: 6rem 0 3rem;
 }
 
-.nav-container .nav-button div {
-  padding: 0.625rem 1rem;
-  height: 3.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6.25rem;
-  cursor: pointer;
-  background-color: var(--color-brand);
-}
 
 .nav-button.inactive div {
   background-color: var(--color-lightgrey);
@@ -144,25 +184,8 @@ div section.nav-button {
   svg {
     fill: black;
   }
-
 }
 
-.nav-container .nav-button p {
-  margin: 0 0.5rem;
-  font-family: var(--font-main);
-  font-size: 1.5rem;
-
-  font-weight: 500;
-  line-height: 1.25rem;
-  letter-spacing: 0.00625rem;
-  color: var(--color-primary);
-}
-
-.arrow-icon {
-  path {
-    fill: var(--color-primary);
-  }
-}
 
 .inactive path {
   fill: var(--color-black);
@@ -176,22 +199,10 @@ div section.nav-button {
 }
 
 
-
-.disclaimer,
-.question,
-#other-text {
-  color: var(--color-black, #333F48);
-  font-family: var(--font-main, Roboto, sans-serif);
-  font-size: 1.5rem;
-
-  font-weight: 400;
-  line-height: 2rem;
-}
-
 #other-text {
   display: inline-flex;
   text-align-last: center;
-  border-radius: 10rem;
+  border-radius: 0.3rem;
 }
 
 #other-checkbox:not(:checked)+label+.input-text {
@@ -225,7 +236,6 @@ div section.nav-button {
 
 [type="radio"] {
   border-radius: 50%;
-
 }
 
 [type="checkbox"] {
@@ -711,14 +721,16 @@ progress::-moz-progress-bar {
     justify-content: space-between;
     width: 100%;
 
-    .nav-button .previous-sound {
-        background-color: var(--color-black);
-        flex-direction: row-reverse;
-        svg {
-          transform: rotate(180deg);
-        }
+    .nav-button #previous-sound {
+      visibility: hidden;
+      background-color: var(--color-black);
+      flex-direction: row-reverse;
+
+      svg {
+        transform: rotate(180deg);
+      }
     }
-    
+
   }
 }
 
@@ -742,12 +754,16 @@ progress::-moz-progress-bar {
     justify-content: space-between;
     width: 100%;
     padding: 1rem 0.5rem;
+
   }
 
-  .indicator, .track, .symbols {
+  .indicator,
+  .track,
+  .symbols {
     display: flex;
     flex-direction: row;
     align-items: center;
+    user-select: none;
   }
 }
 
@@ -757,9 +773,14 @@ progress::-moz-progress-bar {
   height: 1rem;
 }
 
+.sound-track-button {
+  cursor: pointer;
+}
+
 .bars {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
   position: absolute;
   top: 0;
   left: 0;
@@ -769,6 +790,11 @@ progress::-moz-progress-bar {
 
 .bar {
   width: 1px;
-  height: 15px;
+  height: 10px;
   background: white;
+}
+
+.eclipse {
+  position: absolute;
+  z-index: 1;
 }
