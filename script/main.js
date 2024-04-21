@@ -69,7 +69,7 @@ function handleVolumeButtonClick(event) {
 
 }
 
-function playback(event, volume) {
+function playback(event, volume = 7) {
     event.preventDefault();
     const soundToGet = '8000_50';
     console.log(soundToGet);
