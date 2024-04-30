@@ -262,10 +262,9 @@ function changeSlide(slideToGet) {
 // PLAYBACK
 
 const audio = new Audio();
-const audioContext = new AudioContext();
-const stereoNode = new StereoPannerNode(audioContext);
-const source = audioContext.createMediaElementSource(audio);
-source.connect(stereoNode).connect(audioContext.destination);
+let audioContext;
+let stereoNode;
+let source;
 
 async function playback(volume = 5, pan = 0) {
   if (!volume) {
@@ -276,6 +275,13 @@ async function playback(volume = 5, pan = 0) {
   return new Promise((resolve, reject) => {
     audio.src = `resources/sounds/${volume * 2}000_50.ogg`;
     audio.volume = (1 / 5) * volume;
+    if (!audioContext) {
+      audioContext = new AudioContext();
+      stereoNode = new StereoPannerNode(audioContext);
+      source = audioContext.createMediaElementSource(audio);
+      source.connect(stereoNode).connect(audioContext.destination);
+    }
+
     stereoNode.pan.value = pan;
     audio.play();
     audio.onended = () => {
