@@ -829,7 +829,7 @@ const SLIDE_5 = `
                 <img style="width: 31.3125rem;
             height: 20.25rem;
             flex-shrink: 0;" class="final-image"
-                    src="../../resources/images/hearing_buds/Doro_HearingBuds_bud_outside_no_grip_1.png"
+                    src="./resources/images/hearing_buds/Doro_HearingBuds_bud_outside_no_grip_1.png"
                     alt="Doro HearingBuds bud outside no grip 1" srcset="">
             </div>
         </section>
