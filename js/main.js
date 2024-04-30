@@ -111,7 +111,7 @@ function getCalibrationSlide() {
   );
 }
 
-async function getSoundTestSlide(hearingTestType, datadirection) {
+async function getSoundTestSlide(hearingTestType, datadirection, pan) {
   await getSoundTestSlideHTML(hearingTestType, datadirection);
 
   $all(".change-sound").forEach((button) =>
@@ -139,7 +139,7 @@ async function getSoundTestSlide(hearingTestType, datadirection) {
         soundTrackButtons.forEach(
           (button) => (button.querySelector("path").style.fill = "#748C80")
         );
-        playback(value).then(() => {
+        playback(value, pan).then(() => {
           soundTrackButtons.forEach(
             (button) => (button.querySelector("path").style.fill = "#008545")
           );
@@ -234,9 +234,9 @@ const actions = {
   0: () => getWelcomeSlide(),
   1: () => getFormSlide(),
   2: () => getCalibrationSlide(),
-  3: () => getSoundTestSlide(setEarTestTypeHtml(2, "both-ears", "Both ears"), 6), //both ears
-  4: () => getSoundTestSlide(setEarTestTypeHtml(1, "left-ear", "Left ear"), 5), //left ear
-  5: () => getSoundTestSlide(setEarTestTypeHtml(1, "right-ear", "Right ear"), 6), // right ear
+  3: () => getSoundTestSlide(setEarTestTypeHtml(2, "both-ears", "Both ears"), 6, 0), //both ears
+  4: () => getSoundTestSlide(setEarTestTypeHtml(1, "left-ear", "Left ear"), 5, -1), //left ear
+  5: () => getSoundTestSlide(setEarTestTypeHtml(1, "right-ear", "Right ear"), 6, 1), // right ear
   6: () => getResultSlide(),
 };
 
@@ -262,8 +262,12 @@ function changeSlide(slideToGet) {
 // PLAYBACK
 
 const audio = new Audio();
+const audioContext = new AudioContext();
+const stereoNode = new StereoPannerNode(audioContext);
+const source = audioContext.createMediaElementSource(audio);
+source.connect(stereoNode).connect(audioContext.destination);
 
-async function playback(volume = 5) {
+async function playback(volume = 5, pan = 0) {
   if (!volume) {
     audio.pause();
     return;
@@ -272,6 +276,7 @@ async function playback(volume = 5) {
   return new Promise((resolve, reject) => {
     audio.src = `resources/sounds/${volume * 2}000_50.ogg`;
     audio.volume = (1 / 5) * volume;
+    stereoNode.pan.value = pan;
     audio.play();
     audio.onended = () => {
       resolve();
@@ -356,7 +361,7 @@ const hearingbudsMayHelpText =
 const hearingbudsMayNotHelpTitle = "The HearingBuds will probably not help you";
 const hearingbudsMayNotHelpText =
   "Based on your online hearing test results, your hearing sensitivity is within normal range across all frequencies tested.";
-const abortTestWarningText = `Are you sure you want to restart the test?`;
+const abortTestWarningText = `If you restart this test you will lose all your progress.`;
 
 // HTML TEST TYPES
 
@@ -454,7 +459,7 @@ const SLIDE_2 = `
                     <li>
                         <input type="checkbox" id="noisy-environments" name="noisy-environments"
                             class="input-checkbox difficulties">
-                        <label for="noisy-environment">Noisy environments (restaurants etc.)</label>
+                        <label for="noisy-environments">Noisy environments (restaurants etc.)</label>
                     </li>
                     <li>
                         <input type="checkbox" id="tv-radio" name="tv-radio" class="input-checkbox difficulties">
@@ -638,15 +643,15 @@ function setSoundTestDialogHTML(text, datadirection) {
 
 function setRestartTestDialogHTML(text) {
   hearingTestContainer.querySelector("#dialog").innerHTML = `
-    <p id="dialog-text">${text}</p>
+    <p id="dialog-text" style="text-align: center;">${text}</p>
     <a href="https://developer.mozilla.org/es/docs/Web/CSS/::backdrop" target="_blank"></a>
     <button id="dialog-close-btn" aria-label="close" class="x"><svg class="dialog-x" width="40" height="40"
             viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
             <path
                 d="M31.6668 10.6833L29.3168 8.33331L20.0002 17.65L10.6835 8.33331L8.3335 10.6833L17.6502 20L8.3335 29.3166L10.6835 31.6666L20.0002 22.35L29.3168 31.6666L31.6668 29.3166L22.3502 20L31.6668 10.6833Z" />
         </svg></button>
-    <div class="nav-container button" style="gap: 0">
-    <section  id="start-hearing-test" class="nav-button restart-test" data-direction="0">
+    <div class="nav-container button" style="gap: 0;height: 16rem; justify-content: flex-end;">
+    <section  id="start-hearing-test" class="nav-button restart-test" style="margin-bottom: 1.5rem; margin-top: 0" data-direction="0">
     <div>
         <p style="color: #008545">
             Yes, restart hearing test
@@ -656,7 +661,7 @@ function setRestartTestDialogHTML(text) {
         </svg>
     </div>
 </section>
-        <section onclick=dialog.close() class="nav-button">
+        <section onclick=dialog.close() class="nav-button" style="margin-bottom: 1.5rem; margin-top: 0">
         <div>
             <p>
                 No, continue with current test
