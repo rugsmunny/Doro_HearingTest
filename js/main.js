@@ -111,8 +111,8 @@ function getCalibrationSlide() {
   );
 }
 
-async function getSoundTestSlide(hearingTestType, datadirection, pan) {
-  await getSoundTestSlideHTML(hearingTestType, datadirection);
+async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
+  await getSoundTestSlideHTML(hearingTestType, earText, datadirection);
 
   $all(".change-sound").forEach((button) =>
     button.addEventListener("click", async () => {
@@ -234,9 +234,9 @@ const actions = {
   0: () => getWelcomeSlide(),
   1: () => getFormSlide(),
   2: () => getCalibrationSlide(),
-  3: () => getSoundTestSlide(setEarTestTypeHtml(2, "both-ears", "Both ears"), 6, 0), //both ears
-  4: () => getSoundTestSlide(setEarTestTypeHtml(1, "left-ear", "Left ear"), 5, -1), //left ear
-  5: () => getSoundTestSlide(setEarTestTypeHtml(1, "right-ear", "Right ear"), 6, 1), // right ear
+  3: () => getSoundTestSlide(setEarTestTypeHtml(2, "both-ears", "Both ears"), "ears", 6, 0), //both ears
+  4: () => getSoundTestSlide(setEarTestTypeHtml(1, "left-ear", "Left ear"), "left ear", 5, -1), //left ear
+  5: () => getSoundTestSlide(setEarTestTypeHtml(1, "right-ear", "Right ear"), "right ear", 6, 1), // right ear
   6: () => getResultSlide(),
 };
 
@@ -678,7 +678,7 @@ function setRestartTestDialogHTML(text) {
     `;
 }
 
-async function getSoundTestSlideHTML(hearingTestType, datadirection) {
+async function getSoundTestSlideHTML(hearingTestType, earText, datadirection) {
   hearingTestContainer.innerHTML = `
     <div class="slide">
     <section class="text title hearing-test width-large">Hearing test
@@ -692,8 +692,7 @@ async function getSoundTestSlideHTML(hearingTestType, datadirection) {
             <ol>
                 <li>
                     <p class="text">
-                    Move the slider to where you can barely hear the sound in your left ear, 
-                    by dragging the green circle, or using the plus + and minus - buttons.
+                    Move the slider to where you can barely hear the sound in your ${earText}, by dragging the green circle, or using the plus + and minus - buttons.
                     </p>
                 </li>
                 <li>
