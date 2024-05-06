@@ -115,14 +115,11 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
   await getSoundTestSlideHTML(hearingTestType, earText, datadirection);
 
   $all(".change-sound").forEach((button) =>
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       if (!audio.paused) {
         audio.pause();
       }
-      await changeSound(button);
-      moveSoundTrackElips(
-        USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index]
-      );
+      changeSound(button);
     })
   );
 
@@ -134,8 +131,6 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
         +$(".eclipse").getAttribute("value");
       if (value >= 0 && value <= 5) {
         moveSoundTrackElips(value);
-        USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index] =
-          value;
         soundTrackButtons.forEach(
           (button) => (button.querySelector("path").style.fill = "#748C80")
         );
@@ -144,10 +139,26 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
             (button) => (button.querySelector("path").style.fill = "#008545")
           );
         });
-        $(".eclipse").setAttribute("value", value);
       }
     })
   );
+
+  $(".track").addEventListener("click", (event) => {
+    const mouseX = event.clientX;
+    const trackRect = event.currentTarget.getBoundingClientRect();
+    const trackWidth = trackRect.width;
+    const position = Math.round((mouseX - trackRect.left) / (trackWidth / 5));
+    moveSoundTrackElips(position);
+    soundTrackButtons.forEach(
+      (button) => (button.querySelector("path").style.fill = "#748C80")
+    );
+    playback(position, pan).then(() => {
+      soundTrackButtons.forEach(
+        (button) => (button.querySelector("path").style.fill = "#008545")
+      );
+    });
+  });
+
   $(".restart-test").addEventListener("click", (event) => {
     event.preventDefault();
     setRestartTestDialogHTML(abortTestWarningText);
@@ -185,8 +196,6 @@ const USER_DATA = {
     false: [0, 0, 0, 0, 0],
   },
 };
-
-let testValues = [0, 0, 0, 0, 0];
 
 // FORM HELPERS
 
@@ -234,9 +243,27 @@ const actions = {
   0: () => getWelcomeSlide(),
   1: () => getFormSlide(),
   2: () => getCalibrationSlide(),
-  3: () => getSoundTestSlide(setEarTestTypeHtml(2, "both-ears", "Both ears"), "ears", 6, 0), //both ears
-  4: () => getSoundTestSlide(setEarTestTypeHtml(1, "left-ear", "Left ear"), "left ear", 5, -1), //left ear
-  5: () => getSoundTestSlide(setEarTestTypeHtml(1, "right-ear", "Right ear"), "right ear", 6, 1), // right ear
+  3: () =>
+    getSoundTestSlide(
+      setEarTestTypeHtml(2, "both-ears", "Both ears"),
+      "ears",
+      6,
+      0
+    ), //both ears
+  4: () =>
+    getSoundTestSlide(
+      setEarTestTypeHtml(1, "left-ear", "Left ear"),
+      "left ear",
+      5,
+      -1
+    ), //left ear
+  5: () =>
+    getSoundTestSlide(
+      setEarTestTypeHtml(1, "right-ear", "Right ear"),
+      "right ear",
+      6,
+      1
+    ), // right ear
   6: () => getResultSlide(),
 };
 
@@ -281,9 +308,7 @@ async function playback(volume = 5, pan = 0) {
       source = audioContext.createMediaElementSource(audio);
       source.connect(stereoNode).connect(audioContext.destination);
     }
-
     stereoNode.pan.value = pan;
-    audio.play();
     audio.onended = () => {
       resolve();
     };
@@ -293,6 +318,7 @@ async function playback(volume = 5, pan = 0) {
     audio.addEventListener("error", (error) => {
       reject(error);
     });
+    audio.play();
   });
 }
 
@@ -303,8 +329,9 @@ function moveSoundTrackElips(soundTrackEclipseTracker) {
   $(
     ".track"
   ).style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${soundTrackEclipseTracker} - 1.4rem), #333F48 0%)`;
+  USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index] =
+    soundTrackEclipseTracker;
 }
-
 
 let index = 0;
 function changeSound(button) {
@@ -318,14 +345,21 @@ function changeSound(button) {
     $("#next-sound").querySelector("p").textContent =
       iteration == "5" ? "Finish test" : "Next sound";
     iteration == "5"
-      ? $("#next-sound").addEventListener("click", navigate)
-      : $("#next-sound").removeEventListener("click", navigate);
+      ? $("#next-sound").addEventListener("click", (event) => {
+          index += +button.getAttribute("value");
+          navigate(event);
+        })
+      : $("#next-sound").removeEventListener("click", (event) => {
+          index += +button.getAttribute("value");
+          navigate(event);
+        });
     $("#previous-sound").style.visibility =
       soundTestIteration.textContent > 1 ? "visible" : "hidden";
-      index += +button.getAttribute("value");
+    index += +button.getAttribute("value");
+    moveSoundTrackElips(
+      USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index]
+    );
   }
-  
-
 }
 
 // MODAL / DIALOG
@@ -371,20 +405,19 @@ const abortTestWarningText = `If you restart this test you will lose all your pr
 
 // HTML TEST TYPES
 
-function setEarTestTypeHtml(numOfEars, className, text){
+function setEarTestTypeHtml(numOfEars, className, text) {
   let htmlToReturn = `<span class="${className}">`;
-  while(numOfEars > 0){
+  while (numOfEars > 0) {
     htmlToReturn += ` <svg width="48" height="48" viewBox="0 0 48 48" fill="none"
     xmlns="http://www.w3.org/2000/svg">
     <path
         d="M34 40.78C33.42 40.78 32.88 40.66 32.48 40.48C31.06 39.74 30.06 38.72 29.06 35.72C28.04 32.6 26.12 31.14 24.28 29.72C22.7 28.5 21.06 27.24 19.64 24.66C18.58 22.74 18 20.64 18 18.78C18 13.18 22.4 8.77997 28 8.77997C33.6 8.77997 38 13.18 38 18.78H42C42 10.92 35.86 4.77997 28 4.77997C20.14 4.77997 14 10.92 14 18.78C14 21.3 14.76 24.08 16.14 26.58C17.96 29.88 20.1 31.54 21.84 32.88C23.46 34.12 24.62 35.02 25.26 36.98C26.46 40.62 28 42.66 30.72 44.08C31.74 44.54 32.86 44.78 34 44.78C38.42 44.78 42 41.2 42 36.78H38C38 38.98 36.2 40.78 34 40.78ZM15.28 6.05997L12.44 3.21997C8.46 7.19997 6 12.7 6 18.78C6 24.86 8.46 30.36 12.44 34.34L15.26 31.52C12.02 28.26 10 23.76 10 18.78C10 13.8 12.02 9.29997 15.28 6.05997ZM23 18.78C23 21.54 25.24 23.78 28 23.78C30.76 23.78 33 21.54 33 18.78C33 16.02 30.76 13.78 28 13.78C25.24 13.78 23 16.02 23 18.78Z"
         fill="#008545" />
-    </svg>`
+    </svg>`;
     numOfEars--;
   }
   return `${htmlToReturn}<p>${text}</p></span>`;
 }
-
 
 // HTML TEMPLATES
 const SLIDE_1 = `
