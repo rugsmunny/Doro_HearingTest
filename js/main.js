@@ -96,7 +96,7 @@ function getCalibrationSlide() {
           playPauseIcons.forEach((svg) =>
             svg.classList.toggle("non-displayed")
           );
-          await playback();
+          await playback(0, "resources/sounds/Mono/DoroCalibrated.mp3");
           playPauseIcons.forEach((svg) =>
             svg.classList.toggle("non-displayed")
           );
@@ -115,30 +115,31 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
   await getSoundTestSlideHTML(hearingTestType, earText, datadirection);
 
   $all(".change-sound").forEach((button) =>
-    button.addEventListener("click", () => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
       if (!audio.paused) {
         audio.pause();
       }
-      changeSound(button);
+      if (button.querySelector("p").textContent === "Finish test") {
+        navigate(event);
+      } else {
+        changeSound(button); //
+      }
     })
   );
 
   const soundTrackButtons = $all(".sound-track-button");
   soundTrackButtons.forEach((button) =>
-    button.addEventListener("click", async (event) => {
+    button.addEventListener("click", (event) => {
       const value =
         +event.currentTarget.getAttribute("value") +
         +$(".eclipse").getAttribute("value");
       if (value >= 0 && value <= 5) {
         moveSoundTrackElips(value);
+        setUserTestValueAndRunPlayback(value);
         soundTrackButtons.forEach(
           (button) => (button.querySelector("path").style.fill = "#748C80")
         );
-        playback(value, pan).then(() => {
-          soundTrackButtons.forEach(
-            (button) => (button.querySelector("path").style.fill = "#008545")
-          );
-        });
       }
     })
   );
@@ -149,15 +150,24 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
     const trackWidth = trackRect.width;
     const position = Math.round((mouseX - trackRect.left) / (trackWidth / 5));
     moveSoundTrackElips(position);
+    console.log(`position: ${position}`);
+    setUserTestValueAndRunPlayback(position);
     soundTrackButtons.forEach(
       (button) => (button.querySelector("path").style.fill = "#748C80")
     );
-    playback(position, pan).then(() => {
+  });
+
+  function setUserTestValueAndRunPlayback(testValue) {
+    USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index] = testValue;
+    playback(
+      pan,
+      `resources/sounds/Mono/Doro_${frequency}_${decibel}dB_mono.mp3`
+    ).then(() => {
       soundTrackButtons.forEach(
         (button) => (button.querySelector("path").style.fill = "#008545")
       );
     });
-  });
+  }
 
   $(".restart-test").addEventListener("click", (event) => {
     event.preventDefault();
@@ -166,8 +176,22 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
   });
 }
 
-function getResultSlide() {
-  hearingTestContainer.innerHTML = SLIDE_5;
+async function getResultSlide() {
+  const testResults = USER_DATA.testIsWithHeadphones[testIsWithHeadphones];
+  let title = "";
+  let text = "";
+
+  if (testResults.every((value) => value === 5)) {
+    title = alarmingResultsTitle;
+    text = alarmingResultsText;
+  } else if (testResults.every((value) => value < 2)) {
+    title = hearingbudsMayNotHelpTitle;
+    text = hearingbudsMayNotHelpText;
+  } else {
+    title = hearingbudsMayHelpTitle;
+    text = hearingbudsMayHelpText;
+  }
+  await setResultSlide(title, text);
   document.querySelector(".get-hearing-buds").addEventListener("click", () => {
     window.location.href = STORE_URL;
   });
@@ -192,8 +216,8 @@ const USER_DATA = {
     no: false,
   },
   testIsWithHeadphones: {
-    true: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    false: [0, 0, 0, 0, 0],
+    true: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    false: [4, 4, 4, 4, 4],
   },
 };
 
@@ -288,20 +312,23 @@ function changeSlide(slideToGet) {
 
 // PLAYBACK
 
+const frequencies = ["1kHz", "500Hz", "2kHz", "4kHz", "8kHz"]; // order of sounds
+const decibelBValues = [0, 15, 25, 35, 45, 55]; // order of decibels
+let frequency = frequencies[0]; // start value
+let decibel = decibelBValues[4]; // start value
+
 const audio = new Audio();
 let audioContext;
 let stereoNode;
 let source;
 
-async function playback(volume = 5, pan = 0) {
-  if (!volume) {
+async function playback(pan, audioSrc) {
+  if (!audio.paused) {
     audio.pause();
-    return;
   }
 
   return new Promise((resolve, reject) => {
-    audio.src = `resources/sounds/${volume * 2}000_50.ogg`;
-    audio.volume = (1 / 5) * volume;
+    audio.src = audioSrc;
     if (!audioContext) {
       audioContext = new AudioContext();
       stereoNode = new StereoPannerNode(audioContext);
@@ -329,37 +356,30 @@ function moveSoundTrackElips(soundTrackEclipseTracker) {
   $(
     ".track"
   ).style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${soundTrackEclipseTracker} - 1.4rem), #333F48 0%)`;
-  USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index] =
-    soundTrackEclipseTracker;
+  decibel = decibelBValues[soundTrackEclipseTracker];
 }
 
 let index = 0;
 function changeSound(button) {
   const soundTestIteration = $("#sound-test-iteration");
-  const selectedSoundIndex = +button.getAttribute("value");
-  const iteration =
-    +parseInt(soundTestIteration.textContent) + selectedSoundIndex;
+  const directionChange = +button.getAttribute("value");
+  const iteration = +parseInt(soundTestIteration.textContent) + directionChange;
 
-  if (iteration <= 5 && iteration >= 1) {
-    soundTestIteration.textContent = iteration;
-    $("#next-sound").querySelector("p").textContent =
-      iteration == "5" ? "Finish test" : "Next sound";
-    iteration == "5"
-      ? $("#next-sound").addEventListener("click", (event) => {
-          index += +button.getAttribute("value");
-          navigate(event);
-        })
-      : $("#next-sound").removeEventListener("click", (event) => {
-          index += +button.getAttribute("value");
-          navigate(event);
-        });
-    $("#previous-sound").style.visibility =
-      soundTestIteration.textContent > 1 ? "visible" : "hidden";
-    index += +button.getAttribute("value");
-    moveSoundTrackElips(
-      USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index]
-    );
+  if (iteration < 1 || iteration > 5) {
+    return;
   }
+
+  frequency = frequencies[iteration - 1];
+
+  soundTestIteration.textContent = iteration;
+  $("#next-sound").querySelector("p").textContent =
+    iteration == 5 ? "Finish test" : "Next sound";
+  index += directionChange;
+  $("#previous-sound").style.visibility =
+    soundTestIteration.textContent > 1 ? "visible" : "hidden";
+  const eclipseValue =
+    USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index];
+  moveSoundTrackElips(eclipseValue);
 }
 
 // MODAL / DIALOG
@@ -382,8 +402,8 @@ function resetTestValues() {
   USER_DATA.difficulties.talkingToPeople = false;
   USER_DATA.difficulties.other = false;
   USER_DATA.difficulties.no = false;
-  USER_DATA.testIsWithHeadphones.true = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  USER_DATA.testIsWithHeadphones.false = [0, 0, 0, 0, 0];
+  USER_DATA.testIsWithHeadphones.true = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+  USER_DATA.testIsWithHeadphones.false = [4, 4, 4, 4, 4];
   index = 0;
 }
 
@@ -401,6 +421,9 @@ const hearingbudsMayHelpText =
 const hearingbudsMayNotHelpTitle = "The HearingBuds will probably not help you";
 const hearingbudsMayNotHelpText =
   "Based on your online hearing test results, your hearing sensitivity is within normal range across all frequencies tested.";
+const alarmingResultsTitle =
+  "Attention: You may want to seek professional help.";
+const alarmingResultsText = `Your test results show that you have severe hearing loss in both ears across different frequencies. We recommend you seek professional help.`;
 const abortTestWarningText = `If you restart this test you will lose all your progress.`;
 
 // HTML TEST TYPES
@@ -764,7 +787,7 @@ async function getSoundTestSlideHTML(hearingTestType, earText, datadirection) {
                             d="M566 7.62503C566 11.7672 562.642 15.125 558.5 15.125L7.5 15.125C3.35786 15.125 -1.54005e-06 11.7671 -9.92116e-07 7.625C-4.44185e-07 3.48286 3.35787 0.125 7.5 0.125L558.5 0.125032C562.642 0.125033 566 3.4829 566 7.62503Z"
                             fill="#333F48" />
                     </svg>
-                    <svg class="eclipse" value="0" width="48" height="48" viewBox="0 0 48 48" fill="none"
+                    <svg class="eclipse" value="4" width="48" height="48" viewBox="0 0 48 48" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <circle cx="24" cy="24" r="24" fill="#008545" />
                     </svg>
@@ -853,20 +876,18 @@ async function getSoundTestSlideHTML(hearingTestType, earText, datadirection) {
     <dialog id="dialog"></dialog>`;
 }
 
-const SLIDE_5 = `
+async function setResultSlide(resultTitle, resultText) {
+  hearingTestContainer.innerHTML = `
 <div class="slide">
 <section class="result-title">
     <p class="text heading">Here are your results: </p>
-<h1 class="text title">The HearingBuds may help you</h1>
+<h1 class="text title">${resultTitle}</h1>
 </section>
 <div class="inner-container">
     <div class="part-4">
         <section class="test-container">
             <div class="test info">
-                <p class="text width-large">
-                    Your test results show that you have mild to moderate hearing loss in both ears
-                    across
-                    different frequencies.</p>
+                <p class="text width-large">${resultText}</p>
             </div>
             <div class="test-board" style="background-color: transparent;">
                 <img style="width: 31.3125rem;
@@ -908,5 +929,5 @@ const SLIDE_5 = `
 </div>
 </div>
 <dialog id="dialog"></dialog>`;
-
+}
 getWelcomeSlide();
