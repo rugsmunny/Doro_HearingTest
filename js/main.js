@@ -38,7 +38,9 @@ function getFormSlide() {
       return;
     }
     USER_DATA.yearOfBirth = $("#select-year").textContent;
-    USER_DATA.gender = Array.from(gender).find((radioButton) => radioButton.checked).id;
+    USER_DATA.gender = Array.from(gender).find(
+      (radioButton) => radioButton.checked
+    ).id;
 
     $all(".input-checkbox").forEach((checkbox) => {
       const key = checkbox.id.includes("-")
@@ -121,9 +123,7 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
         navigate(event);
       } else {
         changeSoundTrack(button);
-        updateTrackbar(USER_DATA.testResults[withHeadphones][
-          resultIndex
-        ]);
+        updateTrackbar(USER_DATA.testResults[withHeadphones][resultIndex]);
       }
     })
   );
@@ -158,8 +158,7 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
 
   function initiateAndRunPlayback(decibelValue) {
     decibel = decibelBValues[decibelValue];
-    USER_DATA.testResults[withHeadphones][resultIndex] =
-      decibelValue;
+    USER_DATA.testResults[withHeadphones][resultIndex] = decibelValue;
     playback(
       pan,
       `resources/sounds/Mono/Doro_${currentSound}_${decibel}dB_mono.mp3`
@@ -235,7 +234,11 @@ function validateForm() {
     (checkbox) => checkbox.checked
   );
 
-  if(birthYearSelected && atLeastOneRadioChecked && atLeastOneCheckboxChecked){
+  if (
+    birthYearSelected &&
+    atLeastOneRadioChecked &&
+    atLeastOneCheckboxChecked
+  ) {
     $("#form-btn").classList.remove("inactive");
   } else {
     $("#form-btn").classList.add("inactive");
@@ -314,14 +317,19 @@ let currentSound = sounds[0]; // start value
 let decibel = decibelBValues[4]; // start value
 
 const audio = new Audio();
-const audioContext = new AudioContext();
-const stereoNode = new StereoPannerNode(audioContext);
-const source = audioContext.createMediaElementSource(audio);
-source.connect(stereoNode).connect(audioContext.destination);
+let audioContext;
+let stereoNode;
+let source;
 
 async function playback(pan, audioSrc) {
   if (!audio.paused) {
     audio.pause();
+  }
+  if (!audioContext) {
+    audioContext = new AudioContext();
+    stereoNode = new StereoPannerNode(audioContext);
+    source = audioContext.createMediaElementSource(audio);
+    source.connect(stereoNode).connect(audioContext.destination);
   }
 
   audio.src = audioSrc;
@@ -437,8 +445,8 @@ const SLIDE_1 = `
 <div class="hero-image" alt="Hero Image"></div>
 <div id="welcome">
     <section class="welcome-text">
-        <h1 class="text title">Doro HearingBuds Hearing Test</h1>
-        <p class="text heading width-medium align-center">
+        <h1 class="text title">Doro HearingBuds <br class="line-break">Hearing Test</h1>
+        <p class="text heading align-center">
             Welcome to our Online Hearing Test! <br class="line-break"> Discover if the Doro HearingBuds
             could be beneficial for you
         </p>
@@ -575,7 +583,7 @@ const SLIDE_2 = `
 
 const SLIDE_3 = `
 <div class="slide">
-<h1 class="text title">Calibrate your sound levels</h1>
+<h1 class="text title width-large">Calibrate your sound levels</h1>
 <div class="calibrate-important">
     <div class="flex-row">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">

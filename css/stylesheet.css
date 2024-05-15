@@ -38,9 +38,8 @@ for mobile
 #disclaimer {
   height: 6.75rem;
   margin-bottom: 3rem;
-  width: clamp(80vw, 80%, 53.75rem);
+  width: clamp(70vw, 80%, 53.75rem);
   text-align: left;
-
 }
 
 .sp-between {
@@ -70,15 +69,19 @@ for mobile
   align-items: center;
   gap: clamp(1.5rem, 2.5rem, 4.5rem);
   margin: 6.5rem 0 clamp(7rem, 9rem, 13rem);
+  p.heading {
+    width: clamp(30%, 75%, 80%);
+  }
 }
 
 .slide {
-  height: 75rem;
-  width: 53.75rem;
+  height: clamp(75rem, 75vh, 100vh + 4rem);
+  width: clamp(53.75rem, 53.75vw, 53.75rem);
   padding: 5rem 0 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 2rem;
+  align-items: center;
   flex-basis: 1 1 0;
   * {
     flex-basis: 1 1 0;
@@ -88,7 +91,6 @@ for mobile
 .select-year-of-birth {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 0.75rem;
   align-self: stretch;
   margin-top: 3.5rem;
@@ -97,6 +99,7 @@ for mobile
 
 .pick-your-gender {
   margin-top: 1.5rem;
+  align-self: start;
 }
 
 .hearing-difficulties {
@@ -200,6 +203,7 @@ for mobile
   flex-direction: column;
   align-items: center;
   gap: 6.94rem;
+  margin-bottom: 4rem;
 }
 
 .nav-button.inactive div {
@@ -592,9 +596,8 @@ progress::-moz-progress-bar {
 .calibrate {
   display: inline-flex;
   flex-direction: row;
-  align-items: flex-start;
-  margin-top: 2.5rem;
-
+  width: 100%;
+  justify-content: space-evenly;
   .info {
     width: 35.5rem;
   }
@@ -602,14 +605,16 @@ progress::-moz-progress-bar {
   * {
     color: var(--text-text-primary, #333f48);
   }
+  ol li {
+    line-height: 2.5rem;
+  }
 }
 
 .calibrate-important {
-  margin-top: 3.5rem;
+  margin-top: 1.5rem;
   display: flex;
   width: 53.75rem;
   padding: 1.5rem 2.5rem;
-  align-content: center;
   border-radius: 1rem;
   background: var(--surface-surface-softaccent, #eaeaea);
   flex-direction: column;
@@ -702,9 +707,6 @@ progress::-moz-progress-bar {
 }
 
 .hand-rub {
-  width: 12.41356rem;
-  height: 24.06006rem;
-  transform: rotate(5deg);
   flex-shrink: 0;
   fill: var(--color-brand-green, #008545);
 }
@@ -1010,6 +1012,12 @@ progress::-moz-progress-bar {
   display: none;
 }
 
+@media screen and (max-width: 970px) {
+  .line-break {
+    display: block;
+  }
+}
+
 @media screen and (max-width: 590px) {
   :root {
     --font-main: Roboto, sans-serif;
@@ -1048,9 +1056,6 @@ progress::-moz-progress-bar {
     background: url("../resources/images/hero/hero-image-mobile.png")
       var(--color-lightgrey) 50% / cover no-repeat;
   }
-  .line-break {
-    display: block;
-  }
 
   #welcome {
     padding: 0 1rem;
@@ -1062,8 +1067,6 @@ progress::-moz-progress-bar {
     align-self: stretch;
     text-align: center;
     .welcome-text {
-      width: 100%;
-
       margin: 0 auto;
       gap: 2.5rem;
       .title {
@@ -1072,7 +1075,6 @@ progress::-moz-progress-bar {
         line-height: 2.5rem;
       }
       p {
-        width: 75%;
         font-size: 1.5rem;
         font-weight: 400;
         line-height: 2rem;
