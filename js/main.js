@@ -13,7 +13,7 @@ function getWelcomeSlide() {
 function getFormSlide() {
   hearingTestContainer.innerHTML = SLIDE_2;
 
-  populateYearOfBirthOptions($("#year-of-birth-dropdown"));
+  populateYearOfBirthDropdown($("#year-of-birth-dropdown"));
 
   const gender = $all(".input-radio");
 
@@ -38,11 +38,8 @@ function getFormSlide() {
       return;
     }
     USER_DATA.yearOfBirth = $("#select-year").textContent;
-    gender.forEach((radioButton) => {
-      if (radioButton.checked) {
-        USER_DATA.gender = radioButton.id;
-      }
-    });
+    USER_DATA.gender = Array.from(gender).find((radioButton) => radioButton.checked).id;
+
     $all(".input-checkbox").forEach((checkbox) => {
       const key = checkbox.id.includes("-")
         ? dashIdToCamelCase(checkbox.id)
@@ -52,7 +49,6 @@ function getFormSlide() {
         USER_DATA.difficulties[key] = $("#tell-us-more-about-it").value;
       }
     });
-    console.table(USER_DATA);
     navigate(event);
   });
 }
@@ -61,7 +57,7 @@ function dashIdToCamelCase(id) {
   return id.replace(/-(.)/g, (_, char) => char.toUpperCase());
 }
 
-let testIsWithHeadphones = false;
+let withHeadphones = false;
 function getCalibrationSlide() {
   hearingTestContainer.innerHTML = SLIDE_3;
 
@@ -75,13 +71,13 @@ function getCalibrationSlide() {
           if (!audio.paused) {
             audio.pause();
           }
-          testIsWithHeadphones = event.currentTarget.id === "with";
+          withHeadphones = event.currentTarget.id === "with";
           const textToDisplay = `${
-            testIsWithHeadphones
+            withHeadphones
               ? initialTestTextWithHeadphones
               : initialTestTextWithoutHeadphones
           }${testDescription}`;
-          const datadirection = testIsWithHeadphones ? 4 : 3;
+          const datadirection = withHeadphones ? 4 : 3;
           setSoundTestDialogHTML(textToDisplay, datadirection);
           displayModal();
           break;
@@ -121,23 +117,27 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
         audio.pause();
       }
       if (button.querySelector("p").textContent === "Finish test") {
+        resultIndex++;
         navigate(event);
       } else {
-        changeSound(button); //
+        changeSoundTrack(button);
+        updateTrackbar(USER_DATA.testResults[withHeadphones][
+          resultIndex
+        ]);
       }
     })
   );
 
-  const soundTrackButtons = $all(".sound-track-button");
-  soundTrackButtons.forEach((button) =>
+  const volumeButtons = $all(".sound-track-button");
+  volumeButtons.forEach((button) =>
     button.addEventListener("click", (event) => {
       const value =
         +event.currentTarget.getAttribute("value") +
-        +$(".eclipse").getAttribute("value");
+        +$(".trackbar-marker").getAttribute("value");
       if (value >= 0 && value <= 5) {
-        moveSoundTrackElips(value);
-        setUserTestValueAndRunPlayback(value);
-        soundTrackButtons.forEach(
+        updateTrackbar(value);
+        initiateAndRunPlayback(value);
+        volumeButtons.forEach(
           (button) => (button.querySelector("path").style.fill = "#748C80")
         );
       }
@@ -149,21 +149,22 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
     const trackRect = event.currentTarget.getBoundingClientRect();
     const trackWidth = trackRect.width;
     const position = Math.round((mouseX - trackRect.left) / (trackWidth / 5));
-    moveSoundTrackElips(position);
-    console.log(`position: ${position}`);
-    setUserTestValueAndRunPlayback(position);
-    soundTrackButtons.forEach(
+    updateTrackbar(position);
+    initiateAndRunPlayback(position);
+    volumeButtons.forEach(
       (button) => (button.querySelector("path").style.fill = "#748C80")
     );
   });
 
-  function setUserTestValueAndRunPlayback(testValue) {
-    USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index] = testValue;
+  function initiateAndRunPlayback(decibelValue) {
+    decibel = decibelBValues[decibelValue];
+    USER_DATA.testResults[withHeadphones][resultIndex] =
+      decibelValue;
     playback(
       pan,
-      `resources/sounds/Mono/Doro_${frequency}_${decibel}dB_mono.mp3`
+      `resources/sounds/Mono/Doro_${currentSound}_${decibel}dB_mono.mp3`
     ).then(() => {
-      soundTrackButtons.forEach(
+      volumeButtons.forEach(
         (button) => (button.querySelector("path").style.fill = "#008545")
       );
     });
@@ -171,13 +172,15 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
 
   $(".restart-test").addEventListener("click", (event) => {
     event.preventDefault();
-    setRestartTestDialogHTML(abortTestWarningText);
+    setRestartTestModal(abortTestWarningText);
     displayModal();
   });
+
+  initiateAndRunPlayback(decibelBValues.indexOf(45)); // start playback at 45dB as soon as page has finish loading
 }
 
-async function getResultSlide() {
-  const testResults = USER_DATA.testIsWithHeadphones[testIsWithHeadphones];
+async function setResultSlide() {
+  const testResults = USER_DATA.testResults[withHeadphones];
   let title = "";
   let text = "";
 
@@ -191,16 +194,15 @@ async function getResultSlide() {
     title = hearingbudsMayHelpTitle;
     text = hearingbudsMayHelpText;
   }
-  await setResultSlide(title, text);
+  await getResultSlide(title, text);
   document.querySelector(".get-hearing-buds").addEventListener("click", () => {
     window.location.href = STORE_URL;
   });
   $("#restart-test").addEventListener("click", (event) => {
     event.preventDefault();
-    setRestartTestDialogHTML(abortTestWarningText);
+    setRestartTestModal(abortTestWarningText);
     displayModal();
   });
-  console.table(USER_DATA);
 }
 
 // FORM AND USER DATA
@@ -215,7 +217,7 @@ const USER_DATA = {
     other: false,
     no: false,
   },
-  testIsWithHeadphones: {
+  testResults: {
     true: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
     false: [4, 4, 4, 4, 4],
   },
@@ -233,15 +235,14 @@ function validateForm() {
     (checkbox) => checkbox.checked
   );
 
-  const formIsValid =
-    birthYearSelected && atLeastOneRadioChecked && atLeastOneCheckboxChecked;
-
-  formIsValid
-    ? $("#form-btn").classList.remove("inactive")
-    : $("#form-btn").classList.add("inactive");
+  if(birthYearSelected && atLeastOneRadioChecked && atLeastOneCheckboxChecked){
+    $("#form-btn").classList.remove("inactive");
+  } else {
+    $("#form-btn").classList.add("inactive");
+  }
 }
 
-function populateYearOfBirthOptions(yearOfBirth) {
+function populateYearOfBirthDropdown(yearOfBirth) {
   const currentYear = new Date().getFullYear();
   for (var year = currentYear; year >= currentYear - 120; year--) {
     const birthYear = document.createElement("p");
@@ -249,12 +250,7 @@ function populateYearOfBirthOptions(yearOfBirth) {
     birthYear.style.textAlign = "end";
     birthYear.textContent = year;
     birthYear.addEventListener("click", () => {
-      console.log(birthYear.textContent);
       $("#select-year").textContent = birthYear.textContent;
-      $("#year-of-birth").classList.remove("on-hover");
-      setTimeout(() => {
-        $("#year-of-birth").classList.add("on-hover");
-      }, 100);
       validateForm();
     });
     yearOfBirth.appendChild(birthYear);
@@ -288,7 +284,7 @@ const actions = {
       6,
       1
     ), // right ear
-  6: () => getResultSlide(),
+  6: () => setResultSlide(),
 };
 
 function navigate(event) {
@@ -312,74 +308,68 @@ function changeSlide(slideToGet) {
 
 // PLAYBACK
 
-const frequencies = ["1kHz", "500Hz", "2kHz", "4kHz", "8kHz"]; // order of sounds
+const sounds = ["1kHz", "500Hz", "2kHz", "4kHz", "8kHz"]; // order of sounds
 const decibelBValues = [0, 15, 25, 35, 45, 55]; // order of decibels
-let frequency = frequencies[0]; // start value
+let currentSound = sounds[0]; // start value
 let decibel = decibelBValues[4]; // start value
 
 const audio = new Audio();
-let audioContext;
-let stereoNode;
-let source;
+const audioContext = new AudioContext();
+const stereoNode = new StereoPannerNode(audioContext);
+const source = audioContext.createMediaElementSource(audio);
+source.connect(stereoNode).connect(audioContext.destination);
 
 async function playback(pan, audioSrc) {
   if (!audio.paused) {
     audio.pause();
   }
 
+  audio.src = audioSrc;
+  stereoNode.pan.value = pan;
+
   return new Promise((resolve, reject) => {
-    audio.src = audioSrc;
-    if (!audioContext) {
-      audioContext = new AudioContext();
-      stereoNode = new StereoPannerNode(audioContext);
-      source = audioContext.createMediaElementSource(audio);
-      source.connect(stereoNode).connect(audioContext.destination);
-    }
-    stereoNode.pan.value = pan;
     audio.onended = () => {
       resolve();
     };
     audio.onpause = () => {
       resolve();
     };
-    audio.addEventListener("error", (error) => {
+    audio.play().catch((error) => {
       reject(error);
     });
-    audio.play();
   });
 }
 
-function moveSoundTrackElips(soundTrackEclipseTracker) {
-  const eclipse = $(".eclipse");
-  eclipse.setAttribute("value", soundTrackEclipseTracker);
-  eclipse.style.left = `calc((100% / 5) * ${soundTrackEclipseTracker} - 1.5rem)`;
+function updateTrackbar(trackbarValue) {
+  const marker = $(".trackbar-marker");
+  marker.setAttribute("value", trackbarValue);
+  marker.style.left = `calc((100% / 5) * ${trackbarValue} - 1.5rem)`;
   $(
     ".track"
-  ).style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${soundTrackEclipseTracker} - 1.4rem), #333F48 0%)`;
-  decibel = decibelBValues[soundTrackEclipseTracker];
+  ).style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${trackbarValue} - 1.4rem), #333F48 0%)`;
 }
 
-let index = 0;
-function changeSound(button) {
-  const soundTestIteration = $("#sound-test-iteration");
-  const directionChange = +button.getAttribute("value");
-  const iteration = +parseInt(soundTestIteration.textContent) + directionChange;
+let resultIndex = 0;
 
-  if (iteration < 1 || iteration > 5) {
+function changeSoundTrack(button) {
+  const currentSoundDisplay = $("#sound-test-iteration");
+  const directionChange = +button.getAttribute("value");
+  const currentSoundNumber =
+    +parseInt(currentSoundDisplay.textContent) + directionChange;
+
+  if (currentSoundNumber < 1 || currentSoundNumber > 5) {
     return;
   }
 
-  frequency = frequencies[iteration - 1];
+  currentSound = sounds[currentSoundNumber - 1];
+  resultIndex += directionChange;
+  currentSoundDisplay.textContent = currentSoundNumber;
 
-  soundTestIteration.textContent = iteration;
   $("#next-sound").querySelector("p").textContent =
-    iteration == 5 ? "Finish test" : "Next sound";
-  index += directionChange;
+    currentSoundNumber == 5 ? "Finish test" : "Next sound";
+
   $("#previous-sound").style.visibility =
-    soundTestIteration.textContent > 1 ? "visible" : "hidden";
-  const eclipseValue =
-    USER_DATA.testIsWithHeadphones[testIsWithHeadphones][index];
-  moveSoundTrackElips(eclipseValue);
+    currentSoundDisplay.textContent > 1 ? "visible" : "hidden";
 }
 
 // MODAL / DIALOG
@@ -402,9 +392,9 @@ function resetTestValues() {
   USER_DATA.difficulties.talkingToPeople = false;
   USER_DATA.difficulties.other = false;
   USER_DATA.difficulties.no = false;
-  USER_DATA.testIsWithHeadphones.true = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
-  USER_DATA.testIsWithHeadphones.false = [4, 4, 4, 4, 4];
-  index = 0;
+  USER_DATA.testResults.true = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+  USER_DATA.testResults.false = [4, 4, 4, 4, 4];
+  resultIndex = 0;
 }
 
 // STORE URL
@@ -449,7 +439,7 @@ const SLIDE_1 = `
     <section class="welcome-text">
         <h1 class="text title">Doro HearingBuds Hearing Test</h1>
         <p class="text heading width-medium align-center">
-            Welcome to our Online Hearing Test! Discover if the Doro HearingBuds
+            Welcome to our Online Hearing Test! <br class="line-break"> Discover if the Doro HearingBuds
             could be beneficial for you
         </p>
         <div class="nav-container">
@@ -480,6 +470,7 @@ const SLIDE_2 = `
 <h1 class="text title width-large">First tell us a little about yourself</h1>
 <section class="select-year-of-birth">
 <p id="selected-year" class="text align-stretch">Please select your year of birth?</p>
+<div>
 <div id="year-of-birth" class="dropdown-wrapper on-hover">
     <div class="dropdown">
         <span id="select-year" class="text align-stretch">Pick your birth year</span>
@@ -493,7 +484,7 @@ const SLIDE_2 = `
     </div>
     <div id="year-of-birth-dropdown" class="dropdown-content">
     </div>
-</div>
+</div></div>
 </section>
 
             <section class="pick-your-gender">
@@ -703,7 +694,7 @@ function setSoundTestDialogHTML(text, datadirection) {
     `;
 }
 
-function setRestartTestDialogHTML(text) {
+function setRestartTestModal(text) {
   hearingTestContainer.querySelector("#dialog").innerHTML = `
     <p id="dialog-text" style="text-align: center;">${text}</p>
     <a href="https://developer.mozilla.org/es/docs/Web/CSS/::backdrop" target="_blank"></a>
@@ -787,7 +778,7 @@ async function getSoundTestSlideHTML(hearingTestType, earText, datadirection) {
                             d="M566 7.62503C566 11.7672 562.642 15.125 558.5 15.125L7.5 15.125C3.35786 15.125 -1.54005e-06 11.7671 -9.92116e-07 7.625C-4.44185e-07 3.48286 3.35787 0.125 7.5 0.125L558.5 0.125032C562.642 0.125033 566 3.4829 566 7.62503Z"
                             fill="#333F48" />
                     </svg>
-                    <svg class="eclipse" value="4" width="48" height="48" viewBox="0 0 48 48" fill="none"
+                    <svg class="trackbar-marker" value="4" width="48" height="48" viewBox="0 0 48 48" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <circle cx="24" cy="24" r="24" fill="#008545" />
                     </svg>
@@ -876,7 +867,7 @@ async function getSoundTestSlideHTML(hearingTestType, earText, datadirection) {
     <dialog id="dialog"></dialog>`;
 }
 
-async function setResultSlide(resultTitle, resultText) {
+async function getResultSlide(resultTitle, resultText) {
   hearingTestContainer.innerHTML = `
 <div class="slide">
 <section class="result-title">
