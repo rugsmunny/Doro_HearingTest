@@ -123,7 +123,9 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
         navigate(event);
       } else {
         changeSoundTrack(button);
-        updateTrackbar(USER_DATA.testResults[withHeadphones][resultIndex]);
+        const decibelValue = USER_DATA.testResults[withHeadphones][resultIndex];
+        initiateAndRunPlayback(decibelValue);
+        updateTrackbar(decibelValue);
       }
     })
   );
@@ -320,6 +322,7 @@ const audio = new Audio();
 let audioContext;
 let stereoNode;
 let source;
+
 
 async function playback(pan, audioSrc) {
   if (!audio.paused) {
