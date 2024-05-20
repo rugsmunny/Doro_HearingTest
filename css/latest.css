@@ -763,7 +763,6 @@ progress::-moz-progress-bar {
   .calibrate-important.hearing-test {
     align-items: center;
     align-content: center;
-    padding: 3.5rem 1.25rem;
     .volume {
       display: none;
     }

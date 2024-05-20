@@ -58,7 +58,6 @@ function getFormSlide() {
         USER_DATA.difficulties[key] = $("#tell-us-more-about-it").value;
       }
     });
-    console.table(USER_DATA);
     navigate(event);
   });
 }
@@ -71,15 +70,12 @@ let withHeadphones = false;
 
 async function getCalibrationSlide() {
   await getCalibrationSlideHTML();
-  console.log("getCalibrationSlideHTML done");
   $all(".btn").forEach((button) =>
     button.addEventListener("click", async (event) => {
       event.preventDefault();
-      console.log(`${event.currentTarget.id} clicked`);
       switch (event.currentTarget.id) {
         case "with":
         case "without":
-          console.log("case with/whithout");
           if (!audio.paused) {
             audio.pause();
           }
@@ -94,7 +90,6 @@ async function getCalibrationSlide() {
           displayModal();
           break;
         case "play":
-          console.log("case play");
           const calibrationButton = event.currentTarget;
           const playPauseIcons = calibrationButton.querySelectorAll("div svg");
 
@@ -111,11 +106,9 @@ async function getCalibrationSlide() {
           );
           break;
         case "back":
-          console.log("case back");
           navigate(event);
           break;
         default:
-          console.log("case default");
           break;
       }
     })
@@ -146,31 +139,86 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
   const volumeButtons = $all(".volume-button");
   volumeButtons.forEach((button) =>
     button.addEventListener("click", (event) => {
-      const value =
+      let value =
         +event.currentTarget.getAttribute("value") +
         +$(".trackbar-marker").getAttribute("value");
-      if (value >= 0 && value <= 5) {
-        updateTrackbar(value);
-        initiateAndRunPlayback(value);
-        volumeButtons.forEach(
-          (button) => (button.querySelector("path").style.fill = "#748C80")
-        );
-      }
+      if (value < 0) value++;
+      if (value > 5) value--;
+      updateTrackbar(value);
+      initiateAndRunPlayback(value);
+      volumeButtons.forEach(
+        (button) => (button.querySelector("path").style.fill = "#748C80")
+      );
     })
   );
   const trackBars = $all(".track");
-  Array.from(trackBars).forEach((trackBar) => trackBar.addEventListener("click", (event) => {
-    console.log("track clicked");
-    const mouseX = event.clientX;
-    const trackRect = event.currentTarget.getBoundingClientRect();
-    const trackWidth = trackRect.width;
-    const position = Math.round((mouseX - trackRect.left) / (trackWidth / 5));
-    updateTrackbar(position);
-    initiateAndRunPlayback(position);
-    volumeButtons.forEach(
-      (button) => (button.querySelector("path").style.fill = "#748C80")
+  Array.from(trackBars).forEach((trackBar) =>
+    trackBar.addEventListener("click", (event) => {
+      const mouseX = event.clientX;
+      const trackRect = event.currentTarget.getBoundingClientRect();
+      const trackWidth = trackRect.width;
+      const position = Math.round((mouseX - trackRect.left) / (trackWidth / 5));
+      updateTrackbar(position);
+      initiateAndRunPlayback(position);
+      volumeButtons.forEach(
+        (button) => (button.querySelector("path").style.fill = "#748C80")
+      );
+    })
+  );
+
+  function detectMobile() {
+    var result = navigator.userAgent.match(
+      /(iphone)|(ipod)|(ipad)|(android)|(blackberry)|(windows phone)|(symbian)/i
     );
-  }));
+
+    if (result !== null) {
+      return "mobile";
+    } else {
+      return "desktop";
+    }
+  }
+  // const trackMarkers = $all(".trackbar-marker");
+  // trackMarkers.forEach((trackMarker) => {
+  //   trackMarker.addEventListener("mousedown", () => {
+  //     const trackBar = trackMarker.parentElement;
+  //     const trackRect = trackBar.getBoundingClientRect();
+  //     const trackWidth = trackRect.width;
+
+  //     const mouseMoveHandler = (event) => {
+  //       event.preventDefault();
+  //       let mouseX;
+  //       if (detectMobile() == "desktop") {
+  //         mouseX = event.pageX; 
+  //       } else {
+  //         mouseX = event.touches[0].pageX; 
+  //       }
+  //       const newPosition = Math.min(
+  //         Math.max(mouseX - trackRect.left, 0),
+  //         trackWidth
+  //       );
+  //       if (newPosition >= 0 && newPosition <= trackWidth) {
+  //         trackMarker.style.left = `${newPosition}px`;
+  //         trackBar.style.backgroundImage = `linear-gradient(to right, #008545 ${newPosition}px, #333F48 ${newPosition}px)`;
+  //       }
+  //     };
+
+  //     const mouseUpHandler = () => {
+  //       const finalPosition = parseInt(trackMarker.style.left);
+  //       if (finalPosition < 0 || finalPosition > trackWidth) {
+  //         return;
+  //       }
+  //       updateTrackbar(finalPosition);
+  //       initiateAndRunPlayback(finalPosition);
+
+  //       document.removeEventListener("mousemove", mouseMoveHandler);
+  //       document.removeEventListener("mouseup", mouseUpHandler);
+  //       console.log(trackMarker.style.left);
+  //     };
+
+  //     document.addEventListener("mousemove", mouseMoveHandler);
+  //     document.addEventListener("mouseup", mouseUpHandler);
+  //   });
+  // });
 
   function initiateAndRunPlayback(decibelValue) {
     decibel = decibelBValues[decibelValue];
@@ -312,6 +360,9 @@ function navigate(event) {
   if (buttonClicked.classList.contains("inactive")) {
     return;
   }
+  if (!audio.paused) {
+    audio.pause();
+  }
   buttonClicked.removeEventListener("click", navigate);
   changeSlide(buttonClicked.getAttribute("data-direction"));
 }
@@ -366,10 +417,15 @@ async function playback(pan, audioSrc) {
 
 function updateTrackbar(trackbarValue) {
   const markers = $all(".trackbar-marker");
-  Array.from(markers).forEach((marker) => {marker.setAttribute("value", trackbarValue); marker.style.left = `calc((100% / 5) * ${trackbarValue} - 1.5rem)`; });
-  const trackBars =  $all(".track");
-  Array.from(trackBars).forEach((trackBar) => trackBar.style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${trackbarValue} - 1.4rem), #333F48 0%)`);
- 
+  Array.from(markers).forEach((marker) => {
+    marker.setAttribute("value", trackbarValue);
+    marker.style.left = `calc((100% / 5) * ${trackbarValue} - 1.5rem)`;
+  });
+  const trackBars = $all(".track");
+  Array.from(trackBars).forEach(
+    (trackBar) =>
+      (trackBar.style.backgroundImage = `linear-gradient(to right, #008545 calc((100% / 5) * ${trackbarValue} - 1.4rem), #333F48 0%)`)
+  );
 }
 
 let resultIndex = 0;
@@ -401,7 +457,7 @@ function displayModal() {
   $("#dialog").showModal();
   $("#dialog-close-btn").addEventListener("click", () => $("#dialog").close());
   $("#start-hearing-test").addEventListener("click", (event) => {
-    if(!audio.paused){
+    if (!audio.paused) {
       audio.pause();
     }
     navigate(event);
@@ -421,6 +477,27 @@ function resetTestValues() {
   USER_DATA.testResults.true = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
   USER_DATA.testResults.false = [4, 4, 4, 4, 4];
   resultIndex = 0;
+}
+
+// CHECK FOR DESKTOP OR MOBILE
+
+function detectMobile() {
+  var result = navigator.userAgent.match(
+    /(iphone)|(ipod)|(ipad)|(android)|(blackberry)|(windows phone)|(symbian)/i
+  );
+
+  if (result !== null) {
+    return "mobile";
+  } else {
+    return "desktop";
+  }
+}
+
+function onMouseMove(event) {
+  if (detectMobile() == "desktop") {
+    return event.pageX;
+  }
+  return event.touches[0].pageX;
 }
 
 // STORE URL
