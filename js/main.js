@@ -124,7 +124,7 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
       if (!audio.paused) {
         audio.pause();
       }
-      if (button.querySelector("p").textContent === "Finish test") {
+      if (button.classList.contains("test-finished")) {
         resultIndex++;
         navigate(event);
       } else {
@@ -166,17 +166,17 @@ async function getSoundTestSlide(hearingTestType, earText, datadirection, pan) {
     })
   );
 
-  function detectMobile() {
-    var result = navigator.userAgent.match(
-      /(iphone)|(ipod)|(ipad)|(android)|(blackberry)|(windows phone)|(symbian)/i
-    );
+  // function detectMobile() {
+  //   var result = navigator.userAgent.match(
+  //     /(iphone)|(ipod)|(ipad)|(android)|(blackberry)|(windows phone)|(symbian)/i
+  //   );
 
-    if (result !== null) {
-      return "mobile";
-    } else {
-      return "desktop";
-    }
-  }
+  //   if (result !== null) {
+  //     return "mobile";
+  //   } else {
+  //     return "desktop";
+  //   }
+  // }
   // const trackMarkers = $all(".trackbar-marker");
   // trackMarkers.forEach((trackMarker) => {
   //   trackMarker.addEventListener("mousedown", () => {
@@ -443,9 +443,15 @@ function changeSoundTrack(button) {
   currentSound = sounds[currentSoundNumber - 1];
   resultIndex += directionChange;
   currentSoundDisplay.textContent = currentSoundNumber;
-
-  $("#next-sound").querySelector("p").textContent =
-    currentSoundNumber == 5 ? "Finish test" : "Next sound";
+  const nextSoundBtn = $("#next-sound");
+  if(currentSoundNumber == 5) {
+    nextSoundBtn.querySelector("p").textContent = "Finish test";
+    nextSoundBtn.classList.add("test-finished");
+  } else {
+    nextSoundBtn.querySelector("p").textContent = "Next sound";
+    nextSoundBtn.classList.remove("test-finished");
+  }
+  
 
   $("#previous-sound").style.visibility =
     currentSoundDisplay.textContent > 1 ? "visible" : "hidden";
